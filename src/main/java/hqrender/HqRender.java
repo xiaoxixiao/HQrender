@@ -10,10 +10,15 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.7.10]")
+import static hqrender.Tags.MODID;
+
+@Mod(modid = MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.7.10]")
 public class HqRender {
 
-    public static final Logger LOG = LogManager.getLogger(Tags.MODID);
+    public static final Logger LOG = LogManager.getLogger(MODID);
+
+    @Mod.Instance(MODID)
+    public static HqRender instance;
 
     @SidedProxy(clientSide = "hqrender.ClientProxy", serverSide = "hqrender.CommonProxy")
     public static CommonProxy proxy;
