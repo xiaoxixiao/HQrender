@@ -209,7 +209,20 @@ public class FBOHelper {
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         // 恢复保存的模型视图矩阵。
         GL11.glPopMatrix();
-        // 恢复之前保存的视口设置。
+        // 恢复之前保存的视口设置
+        // GL11.glViewport:
+        //这是OpenGL的一个函数，用于设置视口的位置和尺寸。
+        //lastViewport:
+        //这是一个直接整数缓冲区，之前可能已经保存了某个视口的设置。它至少包含4个整数值，分别代表x坐标、y坐标、宽度和高度。
+        //lastViewport.get(0):
+        //从缓冲区中获取第一个整数，代表视口的x坐标。
+        //lastViewport.get(1):
+        //从缓冲区中获取第二个整数，代表视口的y坐标。
+        //lastViewport.get(2):
+        //从缓冲区中获取第三个整数，代表视口的宽度。
+        //lastViewport.get(3):
+        //从缓冲区中获取第四个整数，代表视口的高度。
+        //总体上说，这行代码恢复了一个之前保存的视口设置，通常这在切换渲染目标或在多个渲染阶段之间进行切换时非常有用。恢复原始的视口设置可以确保后续的渲染操作正常显示在期望的屏幕区域内。
         GL11.glViewport(lastViewport.get(0), lastViewport.get(1), lastViewport.get(2), lastViewport.get(3));
         // 恢复默认的Framebuffer。
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, lastFramebuffer);

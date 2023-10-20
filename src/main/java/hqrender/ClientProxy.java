@@ -8,7 +8,6 @@ import java.util.List;
 
 import hqrender.keybind.KeybindHQExportAll;
 import hqrender.keybind.KeybindTest;
-import hqrender.render.RenderHandler;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -51,7 +50,6 @@ public class ClientProxy extends CommonProxy {
     public static String SAVE_ROOT_PLACE = "./export/";
     public static String FILE_SUFFIX = ".json";
     public static int SLEEP_TICK = 100;
-    public static RenderHandler renderHandler;
 
     // Override CommonProxy methods here, if you want a different behaviour on the client (e.g. registering renders).
     // Don't forget to call the super methods as well.
@@ -105,10 +103,6 @@ public class ClientProxy extends CommonProxy {
             FMLCommonHandler.instance()
                 .bus()
                 .register(new KeybindTest());
-
-            FMLCommonHandler.instance()
-                .bus()
-                .register(new RenderHandler());
 
         } else {
             FMLCommonHandler.instance()

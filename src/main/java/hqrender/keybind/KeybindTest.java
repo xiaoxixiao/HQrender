@@ -4,38 +4,24 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.registry.GameData;
-import hqrender.cient.HQMessage;
-import hqrender.render.RenderHandler;
-import net.minecraft.client.Minecraft;
+import hqrender.render.FBOHelper;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static hqrender.cient.HQMessage.HqMessage;
+import static hqrender.render.Renderer.renderItem;
 
 public class KeybindTest {
     public final KeyBinding key;
+    public FBOHelper fbo = new FBOHelper(128);
+    public RenderItem renderItem = new RenderItem();
 
     public KeybindTest() {
         key = new KeyBinding(I18n.format("itemrender.key.test"), Keyboard.KEY_NUMPAD8, "Item Render");
@@ -55,16 +41,23 @@ public class KeybindTest {
     }
 
     public void ItemRender() {
-        RenderHandler render = new RenderHandler();
-        // 随机挑选一个物品纹理
-        Item randomItem = render.hqGetRandomItem();
-        // 设置渲染物品并保持渲染
-        render.setRandomItem(randomItem);
-
+        ItemStack itemStackRandom = randomItem();
         // 获取物品的名称
-        String ItemUnlocalizedName = randomItem.getUnlocalizedName();
+        String ItemUnlocalizedName = itemStackRandom.getUnlocalizedName();
 
         HqMessage("抽取到了", ItemUnlocalizedName);
 
+        renderItem(itemStackRandom, fbo, "", renderItem);
+    }
+
+    public ItemStack randomItem() {
+        Random random = new Random();
+        // 获取所有已注册的物品
+        Object[] registeredItems = Item.itemRegistry.getKeys().toArray();
+        // 从列表中随机选择一个物品
+        Item randomItem = (Item) Item.itemRegistry.getObject(registeredItems[random.nextInt(registeredItems.length)]);
+        // 销毁对象(伪)
+        random = null;
+        return new ItemStack(randomItem, 1);
     }
 }
