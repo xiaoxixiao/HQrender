@@ -107,42 +107,41 @@ public class Renderer {
     }
 
     public static void renderItem(ItemStack itemStack, FBOHelper fbo, String filenameSuffix, RenderItem itemRenderer) {
-        Minecraft minecraft = FMLClientHandler.instance()
-            .getClient();
+        // 获取当前的 Minecraft 实例
+        Minecraft minecraft = FMLClientHandler.instance().getClient();
+        // 获取在 ClientProxy 中定义的渲染比例
         float scale = ClientProxy.renderScale;
+        // 开始使用 FBO（帧缓冲对象）进行渲染，这通常用于在屏幕之外的渲染
         fbo.begin();
-
-        GL11.glMatrixMode(5889);
-        GL11.glPushMatrix();
-        GL11.glLoadIdentity();
-        GL11.glOrtho(0.0D, 16.0D, 0.0D, 16.0D, -150.0D, 150.0D);
-
-        GL11.glMatrixMode(5888);
-        RenderHelper.enableGUIStandardItemLighting();
-
-        GL11.glTranslatef(8.0F * (1.0F - scale), 8.0F * (1.0F - scale), 0.0F);
-        GL11.glScalef(scale, scale, scale);
-
-        RenderBlocks renderBlocks = (RenderBlocks) ReflectionHelper
-            .getPrivateValue(Render.class, itemRenderer, new String[] { "field_147909_c", "renderBlocks" });
-        if (!ForgeHooksClient
-            .renderInventoryItem(renderBlocks, minecraft.renderEngine, itemStack, true, 0.0F, 0.0F, 0.0F)) {
+        // 设置投影矩阵，定义渲染空间
+        GL11.glMatrixMode(5889); // 使用投影矩阵
+        GL11.glPushMatrix(); // 保存当前的矩阵
+        GL11.glLoadIdentity(); // 重置矩阵
+        GL11.glOrtho(0.0D, 16.0D, 0.0D, 16.0D, -150.0D, 150.0D); // 设置正射投影，通常用于2D渲染
+        // 设置模型矩阵，定义物体的变换
+        GL11.glMatrixMode(5888); // 使用模型视图矩阵
+        RenderHelper.enableGUIStandardItemLighting(); // 开启标准的物品光照
+        // 调整物品的位置和大小
+        GL11.glTranslatef(8.0F * (1.0F - scale), 8.0F * (1.0F - scale), 0.0F); // 平移
+        GL11.glScalef(scale, scale, scale); // 缩放
+        // 使用反射从 itemRenderer 获取 RenderBlocks 实例
+        RenderBlocks renderBlocks = (RenderBlocks) ReflectionHelper.getPrivateValue(Render.class, itemRenderer, new String[] { "field_147909_c", "renderBlocks" });
+        // 尝试使用 ForgeHooksClient 渲染物品，如果失败，则使用默认方法渲染
+        if (!ForgeHooksClient.renderInventoryItem(renderBlocks, minecraft.renderEngine, itemStack, true, 0.0F, 0.0F, 0.0F)) {
             itemRenderer.renderItemIntoGUI(null, minecraft.renderEngine, itemStack, 0, 0);
         }
+        // 恢复先前的投影矩阵
         GL11.glMatrixMode(5889);
-        RenderHelper.disableStandardItemLighting();
-        GL11.glPopMatrix();
-
+        RenderHelper.disableStandardItemLighting(); // 关闭标准的物品光照
+        GL11.glPopMatrix(); // 恢复之前保存的矩阵
+        // 结束 FBO 渲染
         fbo.end();
-        fbo.saveToFile(
-            new File(
-                minecraft.mcDataDir,
-                String.format(
-                    "rendered/item_%s_%d%s.png",
-                    new Object[] { itemStack.getItem()
-                        .getUnlocalizedName()
-                        .replaceAll("[^A-Za-z0-9()\\[\\]]", ""), Integer.valueOf(itemStack.getItemDamageForDisplay()),
-                        filenameSuffix })));
+        // 保存 FBO 渲染的结果到文件
+        fbo.saveToFile(new File(minecraft.mcDataDir, String.format("rendered/item_%s_%d%s.png",
+            itemStack.getItem().getUnlocalizedName().replaceAll("[^A-Za-z0-9()\\[\\]]", ""),
+            Integer.valueOf(itemStack.getItemDamageForDisplay()),
+            filenameSuffix)));
+        // 恢复原来的纹理
         fbo.restoreTexture();
     }
 
