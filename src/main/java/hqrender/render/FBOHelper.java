@@ -46,9 +46,25 @@ public class FBOHelper {
         // 检查当前OpenGL的错误状态。如果有错误，通常会抛出异常或记录错误。
         checkGlErrors("FBO Begin Init");
 
-        // 获取当前绑定的Framebuffer的ID，以便稍后恢复。
+        // 获取当前绑定的Framebuffer的ID，以便稍后恢复
+        // GL11.glGetInteger:
+        //这是OpenGL的一个函数，用于获取整数形式的OpenGL状态值。这里它被用来查询当前正被绑定的FBO的ID。
+        //EXTFramebufferObject.GL_FRAMEBUFFER_BINDING_EXT:
+        //这是一个枚举值，代表当前被绑定的帧缓冲对象。注意，这里的EXTFramebufferObject意味着你正在使用EXT帧缓冲对象的扩展。OpenGL的核心规范中也有类似的功能，但前缀可能会不同，如GL_FRAMEBUFFER_BINDING。
+        //lastFramebuffer:
+        //这是一个变量（很可能是整数类型），用于存储当前被绑定的FBO的ID。
+        //总的来说，这行代码允许你保存当前正在使用的FBO的ID。这在以下情境中非常有用：
+        //当你打算切换到另一个FBO进行渲染，但之后又想恢复到原始的FBO时。
+        //当你需要执行一系列操作，而这些操作可能会更改当前的FBO绑定，但你希望在操作完成后恢复原始的绑定。
         lastFramebuffer = GL11.glGetInteger(EXTFramebufferObject.GL_FRAMEBUFFER_BINDING_EXT);
-        // 将自定义的Framebuffer绑定到OpenGL环境中。这样后续的渲染操作就会输出到这个Framebuffer。
+        // 将自定义的Framebuffer绑定到OpenGL环境中。这样后续的渲染操作就会输出到这个Framebuffer
+        // EXTFramebufferObject.glBindFramebufferEXT:
+        //这是使用EXT FBO扩展的绑定函数。它将指定的FBO绑定到渲染目标。
+        //EXTFramebufferObject.GL_FRAMEBUFFER_EXT:
+        //这是一个常量，表示你要绑定的FBO的目标类型。在这种情况下，它指的是FBO本身。OpenGL有其他目标类型，例如GL_DRAW_FRAMEBUFFER和GL_READ_FRAMEBUFFER，但这些是在后续版本中引入的。对于EXT FBO扩展，通常使用GL_FRAMEBUFFER_EXT。
+        //framebufferID:
+        //这是你想绑定的FBO的标识符（ID）。当你首次创建一个FBO时，OpenGL会为你分配一个唯一的ID，你可以使用这个ID来引用和操作FBO。如果framebufferID为0，那么这行代码实际上会解绑任何当前绑定的FBO，这意味着后续的渲染操作将直接渲染到主颜色缓冲区（即屏幕）。
+        //总之，这行代码的作用是绑定一个指定ID的FBO，使其成为当前的渲染目标。这意味着在这之后的OpenGL渲染调用（例如渲染三角形或其他图形）将直接输出到这个FBO，而不是默认的颜色缓冲区。
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, framebufferID);
         // 创建一个直接IntBuffer，用于存储当前的视口（Viewport）设置。
         // GLAllocation.createDirectIntBuffer:
