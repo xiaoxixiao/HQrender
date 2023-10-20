@@ -1,4 +1,4 @@
-package com.myname.mymodid;
+package hqrender;
 
 import java.io.File;
 
